@@ -3,12 +3,12 @@
 // ===========================================
 const firebaseConfig = {
     // REPLACE THESE VALUES WITH YOUR FIREBASE PROJECT CONFIG
-    apiKey: "your-api-key-here",
-    authDomain: "your-project-id.firebaseapp.com",
-    projectId: "your-project-id",
-    storageBucket: "your-project-id.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "your-app-id"
+    apiKey: "AIzaSyBnE7n0pCj4Wluw3UhxK6hLqBz3YGPrNrE",
+    authDomain: "quizmasterapp-643dd.firebaseapp.com",
+    projectId: "quizmasterapp-643dd",
+    storageBucket: "quizmasterapp-643dd.firebasestorage.app",
+    messagingSenderId: "256493990365",
+    appId: "1:256493990365:web:e8536a3a0d588cfd624634"
     
     // To get your config:
     // 1. Go to Firebase Console (https://console.firebase.google.com)
