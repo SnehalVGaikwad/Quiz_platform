@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Event Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #131729;
+            --bg-card: #1a1f3a;
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff006e;
+            --neon-purple: #8b00ff;
+            --neon-green: #00ff88;
+            --neon-yellow: #ffeb3b;
+            --text-primary: #e0e6ff;
+            --text-secondary: #8892b0;
+            --border-glow: rgba(0, 245, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1535 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-cyan);
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(100px, -100px); }
+            50% { transform: translate(-100px, 100px); }
+            75% { transform: translate(50px, 50px); }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(19, 23, 41, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-glow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 245, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--neon-cyan);
+        }
+
+        .nav-pills {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            padding: 0.6rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 25px;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-pill:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        .nav-pill.active {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            border-color: var(--neon-purple);
+            color: var(--bg-primary);
+            box-shadow: 0 0 25px var(--neon-cyan);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Module Sections */
+        .module {
+            display: none;
+        }
+
+        .module.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 245, 255, 0.3);
+            border-color: var(--neon-cyan);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Forms */
+        .form-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 0.8rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 5px 25px rgba(0, 245, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--neon-green), #00cc70);
+            color: var(--bg-primary);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--neon-pink), #cc0055);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .btn-secondary:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-primary);
+        }
+
+        /* Event Cards */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .event-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+        }
+
+        .event-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(0, 245, 255, 0.4);
+        }
+
+        .event-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(139, 0, 255, 0.1));
+        }
+
+        .event-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--neon-cyan);
+        }
+
+        .event-date {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .event-body {
+            padding: 1.5rem;
+        }
+
+        .event-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .event-info span {
+            margin-left: 0.5rem;
+        }
+
+        .event-status {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .status-upcoming {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .status-ongoing {
+            background: rgba(255, 235, 59, 0.2);
+            color: var(--neon-yellow);
+            border: 1px solid var(--neon-yellow);
+        }
+
+        .status-completed {
+            background: rgba(136, 144, 176, 0.2);
+            color: var(--text-secondary);
+            border: 1px solid var(--text-secondary);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(139, 0, 255, 0.1));
+        }
+
+        th {
+            padding: 1.2rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            border-bottom: 2px solid var(--border-glow);
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 245, 255, 0.05);
+        }
+
+        /* Search and Filter */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding-left: 2.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .filter-select {
+            min-width: 200px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 245, 255, 0.4);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--neon-pink);
+            transform: rotate(90deg);
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .alert-error {
+            background: rgba(255, 0, 110, 0.1);
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        .alert-info {
+            background: rgba(0, 245, 255, 0.1);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-pills {
+                justify-content: center;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--neon-cyan), var(--neon-purple));
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--neon-purple), var(--neon-pink));
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">🎓 College Event Hub</div>
+        <nav class="nav-pills">
+            <button class="nav-pill active" onclick="switchModule('dashboard')">Dashboard</button>
+            <button class="nav-pill" onclick="switchModule('events')">Events</button>
+            <button class="nav-pill" onclick="switchModule('registration')">Registration</button>
+            <button class="nav-pill" onclick="switchModule('admin')">Admin</button>
+            <button class="nav-pill" onclick="switchModule('analytics')">Analytics</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Dashboard Module -->
+        <div id="dashboard" class="module active">
+            <h1 class="section-title">📊 Dashboard Overview</h1>
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎉</div>
+                    <div class="stat-value" id="totalEvents">0</div>
+                    <div class="stat-label">Total Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="upcomingEvents">0</div>
+                    <div class="stat-label">Upcoming Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="totalRegistrations">0</div>
+                    <div class="stat-label">Total Registrations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value" id="completedEvents">0</div>
+                    <div class="stat-label">Completed Events</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">🔥 Recent Activity</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Event</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentActivityTable">
+                            <tr>
+                                <td>New Registration</td>
+                                <td>Tech Symposium 2025</td>
+                                <td>2 mins ago</td>
+                                <td><span class="event-status status-upcoming">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>Event Created</td>
+                                <td>Cultural Fest</td>
+                                <td>15 mins ago</td>
+                                <td><span class="event-status status-ongoing">New</span></td>
+                            </tr>
+                            <tr>
+                                <td>Registration Approved</td>
+                                <td>Sports Day</td>
+                                <td>1 hour ago</td>
+                                <td><span class="event-status status-upcoming">Approved</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Module -->
+        <div id="events" class="module">
+            <h1 class="section-title">🎪 All Events</h1>
+            
+            <div class="controls">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="eventSearch" placeholder="Search events..." oninput="filterEvents()">
+                </div>
+                <select class="filter-select" id="eventFilter" onchange="filterEvents()">
+                    <option value="all">All Events</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <button class="btn btn-primary" onclick="openCreateEventModal()">+ Create Event</button>
+            </div>
+
+            <div class="events-grid" id="eventsGrid">
+                <!-- Events will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Registration Module -->
+        <div id="registration" class="module">
+            <h1 class="section-title">📝 Event Registration</h1>
+            
+            <div id="registrationAlert" class="alert"></div>
+
+            <div class="form-section">
+                <h2 class="section-title">Register for an Event</h2>
+                <form id="registrationForm" onsubmit="handleRegistration(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="studentName">Full Name *</label>
+                            <input type="text" id="studentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentEmail">Email *</label>
+                            <input type="email" id="studentEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentPhone">Phone Number *</label>
+                            <input type="tel" id="studentPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentRoll">Roll Number *</label>
+                            <input type="text" id="studentRoll" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentDept">Department *</label>
+                            <select id="studentDept" required>
+                                <option value="">Select Department</option>
+                                <option value="CSE">Computer Science</option>
+                                <option value="ECE">Electronics</option>
+                                <option value="EEE">Electrical</option>
+                                <option value="MECH">Mechanical</option>
+                                <option value="CIVIL">Civil</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentYear">Year *</label>
+                            <select id="studentYear" required>
+                                <option value="">Select Year</option>
+                                <option value="1">First Year</option>
+                                <option value="2">Second Year</option>
+                                <option value="3">Third Year</option>
+                                <option value="4">Fourth Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="selectedEvent">Select Event *</label>
+                        <select id="selectedEvent" required>
+                            <option value="">Choose an event</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalInfo">Additional Information</label>
+                        <textarea id="additionalInfo" placeholder="Any special requirements or notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Registration</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">📋 My Registrations</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Registration ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myRegistrationsTable">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-secondary);">No registrations yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Module -->
+        <div id="admin" class="module">
+            <h1 class="section-title">⚙️ Admin Panel</h1>
+            
+            <div id="adminAlert" class="alert"></div>
+
+            <div class="form-section">
+                <h2 class="section-title">Create New Event</h2>
+                <form id="createEventForm" onsubmit="handleCreateEvent(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="eventName">Event Name *</label>
+                            <input type="text" id="eventName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDate">Event Date *</label>
+                            <input type="date" id="eventDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventTime">Event Time *</label>
+                            <input type="time" id="eventTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventVenue">Venue *</label>
+                            <input type="text" id="eventVenue" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventCategory">Category *</label>
+                            <select id="eventCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Technical">Technical</option>
+                                <option value="Cultural">Cultural</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Seminar">Seminar</option>
+                                <option value="Competition">Competition</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventCapacity">Max Capacity *</label>
+                            <input type="number" id="eventCapacity" required min="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDescription">Event Description *</label>
+                        <textarea id="eventDescription" required placeholder="Describe the event..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventOrganizer">Organizer Name *</label>
+                        <input type="text" id="eventOrganizer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventContact">Contact Email *</label>
+                        <input type="email" id="eventContact" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Create Event</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">📊 Manage Registrations</h2>
+                <div class="controls">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="regSearch" placeholder="Search registrations..." oninput="filterRegistrations()">
+                    </div>
+                    <select class="filter-select" id="regStatusFilter" onchange="filterRegistrations()">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll No</th>
+                                <th>Event</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminRegistrationsTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-secondary);">No registrations to review</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Module -->
+        <div id="analytics" class="module">
+            <h1 class="section-title">📈 Analytics & Reports</h1>
+            
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="avgRegistrations">0</div>
+                    <div class="stat-label">Avg. Registrations per Event</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💯</div>
+                    <div class="stat-value" id="attendanceRate">0%</div>
+                    <div class="stat-label">Overall Attendance Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value" id="popularCategory">-</div>
+                    <div class="stat-label">Most Popular Category</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value" id="eventsThisMonth">0</div>
+                    <div class="stat-label">Events This Month</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">📊 Event-wise Statistics</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Category</th>
+                                <th>Registrations</th>
+                                <th>Capacity</th>
+                                <th>Fill Rate</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analyticsTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-secondary);">No data available</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">🎯 Department-wise Participation</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Registrations</th>
+                                <th>Active Participants</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deptAnalyticsTable">
+                            <tr>
+                                <td>Computer Science</td>
+                                <td>45</td>
+                                <td>42</td>
+                                <td><span class="event-status status-upcoming">93.3%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Electronics</td>
+                                <td>32</td>
+                                <td>28</td>
+                                <td><span class="event-status status-upcoming">87.5%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Mechanical</td>
+                                <td>28</td>
+                                <td>25</td>
+                                <td><span class="event-status status-ongoing">89.3%</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div id="createEventModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeCreateEventModal()">×</span>
+            <h2 class="section-title">🎉 Quick Create Event</h2>
+            <form id="quickEventForm" onsubmit="handleQuickEvent(event)">
+                <div class="form-group">
+                    <label for="quickEventName">Event Name *</label>
+                    <input type="text" id="quickEventName" required>
+                </div>
+                <div class="form-group">
+                    <label for="quickEventDate">Date *</label>
+                    <input type="date" id="quickEventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="quickEventCategory">Category *</label>
+                    <select id="quickEventCategory" required>
+                        <option value="Technical">Technical</option>
+                        <option value="Cultural">Cultural</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Workshop">Workshop</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Event</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let eventsData = [
+            {
+                id: 1,
+                name: "Tech Symposium 2025",
+                date: "2025-11-20",
+                time: "10:00",
+                venue: "Main Auditorium",
+                category: "Technical",
+                description: "Annual technical symposium featuring workshops, paper presentations, and project exhibitions.",
+                capacity: 200,
+                registrations: 156,
+                organizer: "Dr. Sharma",
+                contact: "tech@college.edu",
+                status: "upcoming"
+            },
+            {
+                id: 2,
+                name: "Cultural Fest - Kaleidoscope",
+                date: "2025-11-25",
+                time: "14:00",
+                venue: "Open Ground",
+                category: "Cultural",
+                description: "Three-day cultural extravaganza with dance, music, drama, and fashion shows.",
+                capacity: 500,
+                registrations: 432,
+                organizer: "Cultural Committee",
+                contact: "cultural@college.edu",
+                status: "upcoming"
+            },
+            {
+                id: 3,
+                name: "AI Workshop",
+                date: "2025-11-15",
+                time: "09:00",
+                venue: "CS Lab",
+                category: "Workshop",
+                description: "Hands-on workshop on Machine Learning and Artificial Intelligence basics.",
+                capacity: 50,
+                registrations: 50,
+                organizer: "Prof. Kumar",
+                contact: "ai@college.edu",
+                status: "ongoing"
+            },
+            {
+                id: 4,
+                name: "Inter-College Sports Meet",
+                date: "2025-12-05",
+                time: "08:00",
+                venue: "Sports Complex",
+                category: "Sports",
+                description: "Annual sports competition featuring cricket, football, basketball, and athletics.",
+                capacity: 300,
+                registrations: 189,
+                organizer: "Sports Department",
+                contact: "sports@college.edu",
+                status: "upcoming"
+            }
+        ];
+
+        let registrationsData = [];
+        let activityLog = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createBackgroundAnimation();
+            loadEvents();
+            updateDashboard();
+            populateEventSelect();
+            updateAnalytics();
+        });
+
+        // Background Animation
+        function createBackgroundAnimation() {
+            const container = document.getElementById('bgAnimation');
+            for (let i = 0; i < 50; i++) {
+                const span = document.createElement('span');
+                span.style.left = Math.random() * 100 + '%';
+                span.style.top = Math.random() * 100 + '%';
+                span.style.animationDelay = Math.random() * 15 + 's';
+                container.appendChild(span);
+            }
+        }
+
+        // Module Switching
+        function switchModule(moduleName) {
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+            document.getElementById(moduleName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (moduleName === 'analytics') {
+                updateAnalytics();
+            }
+        }
+
+        // Dashboard Updates
+        function updateDashboard() {
+            const upcomingEvents = eventsData.filter(e => e.status === 'upcoming').length;
+            const completedEvents = eventsData.filter(e => e.status === 'completed').length;
+            const totalRegs = eventsData.reduce((sum, e) => sum + e.registrations, 0);
+
+            document.getElementById('totalEvents').textContent = eventsData.length;
+            document.getElementById('upcomingEvents').textContent = upcomingEvents;
+            document.getElementById('totalRegistrations').textContent = totalRegs;
+            document.getElementById('completedEvents').textContent = completedEvents;
+        }
+
+        // Load Events
+        function loadEvents() {
+            const grid = document.getElementById('eventsGrid');
+            grid.innerHTML = '';
+
+            eventsData.forEach(event => {
+                const fillRate = ((event.registrations / event.capacity) * 100).toFixed(1);
+                const statusClass = event.status === 'upcoming' ? 'status-upcoming' : 
+                                   event.status === 'ongoing' ? 'status-ongoing' : 'status-completed';
+
+                const card = `
+                    <div class="event-card" data-status="${event.status}" data-category="${event.category}">
+                        <div class="event-header">
+                            <h3 class="event-title">${event.name}</h3>
+                            <p class="event-date">📅 ${formatDate(event.date)} • ⏰ ${event.time}</p>
+                        </div>
+                        <div class="event-body">
+                            <div class="event-info">📍 <span>${event.venue}</span></div>
+                            <div class="event-info">🏷️ <span>${event.category}</span></div>
+                            <div class="event-info">👥 <span>${event.registrations}/${event.capacity} registered (${fillRate}%)</span></div>
+                            <p style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">${event.description}</p>
+                            <div class="event-status ${statusClass}">${event.status.toUpperCase()}</div>
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="registerForEvent(${event.id})">Register Now</button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        // Filter Events
+        function filterEvents() {
+            const searchTerm = document.getElementById('eventSearch').value.toLowerCase();
+            const filterStatus = document.getElementById('eventFilter').value;
+            const cards = document.querySelectorAll('.event-card');
+
+            cards.forEach(card => {
+                const matchesSearch = card.textContent.toLowerCase().includes(searchTerm);
+                const matchesFilter = filterStatus === 'all' || card.dataset.status === filterStatus;
+                card.style.display = matchesSearch && matchesFilter ? 'block' : 'none';
+            });
+        }
+
+        // Registration Handling
+        function handleRegistration(e) {
+            e.preventDefault();
+            
+            const registration = {
+                id: Date.now(),
+                name: document.getElementById('studentName').value,
+                email: document.getElementById('studentEmail').value,
+                phone: document.getElementById('studentPhone').value,
+                roll: document.getElementById('studentRoll').value,
+                dept: document.getElementById('studentDept').value,
+                year: document.getElementById('studentYear').value,
+                eventId: parseInt(document.getElementById('selectedEvent').value),
+                eventName: document.getElementById('selectedEvent').selectedOptions[0].text,
+                additionalInfo: document.getElementById('additionalInfo').value,
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            };
+
+            registrationsData.push(registration);
+            
+            // Update event registrations count
+            const event = eventsData.find(e => e.id === registration.eventId);
+            if (event) event.registrations++;
+
+            showAlert('registrationAlert', 'Registration submitted successfully! Your registration ID: ' + registration.id, 'success');
+            document.getElementById('registrationForm').reset();
+            updateMyRegistrations();
+            updateDashboard();
+            updateAdminRegistrations();
+        }
+
+        function updateMyRegistrations() {
+            const table = document.getElementById('myRegistrationsTable');
+            if (registrationsData.length === 0) {
+                table.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No registrations yet</td></tr>';
+                return;
+            }
+
+            table.innerHTML = registrationsData.map(reg => `
+                <tr>
+                    <td>${reg.eventName}</td>
+                    <td>${formatDate(eventsData.find(e => e.id === reg.eventId)?.date)}</td>
+                    <td><span class="event-status ${reg.status === 'approved' ? 'status-upcoming' : reg.status === 'rejected' ? 'status-completed' : 'status-ongoing'}">${reg.status.toUpperCase()}</span></td>
+                    <td>#${reg.id}</td>
+                    <td><button class="btn btn-secondary" onclick="cancelRegistration(${reg.id})">Cancel</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function cancelRegistration(regId) {
+            if (confirm('Are you sure you want to cancel this registration?')) {
+                const index = registrationsData.findIndex(r => r.id === regId);
+                if (index > -1) {
+                    const reg = registrationsData[index];
+                    const event = eventsData.find(e => e.id === reg.eventId);
+                    if (event) event.registrations--;
+                    
+                    registrationsData.splice(index, 1);
+                    updateMyRegistrations();
+                    updateDashboard();
+                    showAlert('registrationAlert', 'Registration cancelled successfully!', 'info');
+                }
+            }
+        }
+
+        // Admin Functions
+        function handleCreateEvent(e) {
+            e.preventDefault();
+            
+            const newEvent = {
+                id: eventsData.length + 1,
+                name: document.getElementById('eventName').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                venue: document.getElementById('eventVenue').value,
+                category: document.getElementById('eventCategory').value,
+                description: document.getElementById('eventDescription').value,
+                capacity: parseInt(document.getElementById('eventCapacity').value),
+                registrations: 0,
+                organizer: document.getElementById('eventOrganizer').value,
+                contact: document.getElementById('eventContact').value,
+                status: 'upcoming'
+            };
+
+            eventsData.push(newEvent);
+            loadEvents();
+            updateDashboard();
+            populateEventSelect();
+            updateAnalytics();
+            
+            showAlert('adminAlert', 'Event created successfully!', 'success');
+            document.getElementById('createEventForm').reset();
+        }
+
+        function updateAdminRegistrations() {
+            const table = document.getElementById('adminRegistrationsTable');
+            if (registrationsData.length === 0) {
+                table.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No registrations to review</td></tr>';
+                return;
+            }
+
+            table.innerHTML = registrationsData.map(reg => `
+                <tr>
+                    <td>${reg.name}</td>
+                    <td>${reg.roll}</td>
+                    <td>${reg.eventName}</td>
+                    <td>${reg.dept}</td>
+                    <td><span class="event-status ${reg.status === 'approved' ? 'status-upcoming' : reg.status === 'rejected' ? 'status-completed' : 'status-ongoing'}">${reg.status.toUpperCase()}</span></td>
+                    <td>
+                        ${reg.status === 'pending' ? `
+                            <button class="btn btn-success" style="padding: 0.5rem 1rem; margin-right: 0.5rem;" onclick="approveRegistration(${reg.id})">✓</button>
+                            <button class="btn btn-danger" style="padding: 0.5rem 1rem;" onclick="rejectRegistration(${reg.id})">✗</button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function approveRegistration(regId) {
+            const reg = registrationsData.find(r => r.id === regId);
+            if (reg) {
+                reg.status = 'approved';
+                updateAdminRegistrations();
+                updateMyRegistrations();
+                showAlert('adminAlert', 'Registration approved!', 'success');
+            }
+        }
+
+        function rejectRegistration(regId) {
+            const reg = registrationsData.find(r => r.id === regId);
+            if (reg) {
+                reg.status = 'rejected';
+                const event = eventsData.find(e => e.id === reg.eventId);
+                if (event) event.registrations--;
+                updateAdminRegistrations();
+                updateMyRegistrations();
+                updateDashboard();
+                showAlert('adminAlert', 'Registration rejected!', 'info');
+            }
+        }
+
+        function filterRegistrations() {
+            const searchTerm = document.getElementById('regSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('regStatusFilter').value;
+            const rows = document.querySelectorAll('#adminRegistrationsTable tr');
+
+            rows.forEach(row => {
+                if (row.cells.length === 1) return; // Skip empty message row
+                const matchesSearch = row.textContent.toLowerCase().includes(searchTerm);
+                const status = row.cells[4].textContent.toLowerCase().trim();
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+            });
+        }
+
+        // Analytics
+        function updateAnalytics() {
+            const totalRegs = eventsData.reduce((sum, e) => sum + e.registrations, 0);
+            const avgRegs = eventsData.length > 0 ? Math.round(totalRegs / eventsData.length) : 0;
+            
+            const categoryCount = {};
+            eventsData.forEach(e => {
+                categoryCount[e.category] = (categoryCount[e.category] || 0) + 1;
+            });
+            const popularCat = Object.keys(categoryCount).reduce((a, b) => 
+                categoryCount[a] > categoryCount[b] ? a : b, '-'
+            );
+
+            const currentMonth = new Date().getMonth();
+            const eventsThisMonth = eventsData.filter(e => 
+                new Date(e.date).getMonth() === currentMonth
+            ).length;
+
+            document.getElementById('avgRegistrations').textContent = avgRegs;
+            document.getElementById('attendanceRate').textContent = '92.5%';
+            document.getElementById('popularCategory').textContent = popularCat;
+            document.getElementById('eventsThisMonth').textContent = eventsThisMonth;
+
+            // Event-wise statistics
+            const analyticsTable = document.getElementById('analyticsTable');
+            analyticsTable.innerHTML = eventsData.map(event => {
+                const fillRate = ((event.registrations / event.capacity) * 100).toFixed(1);
+                const statusClass = fillRate > 80 ? 'status-upcoming' : fillRate > 50 ? 'status-ongoing' : 'status-completed';
+                
+                return `
+                    <tr>
+                        <td>${event.name}</td>
+                        <td>${event.category}</td>
+                        <td>${event.registrations}</td>
+                        <td>${event.capacity}</td>
+                        <td><span class="event-status ${statusClass}">${fillRate}%</span></td>
+                        <td><span class="event-status ${event.status === 'upcoming' ? 'status-upcoming' : event.status === 'ongoing' ? 'status-ongoing' : 'status-completed'}">${event.status.toUpperCase()}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Utility Functions
+        function populateEventSelect() {
+            const select = document.getElementById('selectedEvent');
+            select.innerHTML = '<option value="">Choose an event</option>' + 
+                eventsData.filter(e => e.status === 'upcoming' || e.status === 'ongoing')
+                    .map(e => `<option value="${e.id}">${e.name} - ${formatDate(e.date)}</option>`)
+                    .join('');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        function registerForEvent(eventId) {
+            switchModule('registration');
+            document.querySelector('.nav-pill[onclick*="registration"]').classList.add('active');
+            document.getElementById('selectedEvent').value = eventId;
+        }
+
+        // Modal Functions
+        function openCreateEventModal() {
+            document.getElementById('createEventModal').classList.add('active');
+        }
+
+        function closeCreateEventModal() {
+            document.getElementById('createEventModal').classList.remove('active');
+        }
+
+        function handleQuickEvent(e) {
+            e.preventDefault();
+            const newEvent = {
+                id: eventsData.length + 1,
+                name: document.getElementById('quickEventName').value,
+                date: document.getElementById('quickEventDate').value,
+                time: '10:00',
+                venue: 'TBD',
+                category: document.getElementById('quickEventCategory').value,
+                description: 'Event details will be updated soon.',
+                capacity: 100,
+                registrations: 0,
+                organizer: 'Admin',
+                contact: 'admin@college.edu',
+                status: 'upcoming'
+            };
+
+            eventsData.push(newEvent);
+            loadEvents();
+            updateDashboard();
+            populateEventSelect();
+            closeCreateEventModal();
+            document.getElementById('quickEventForm').reset();
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('createEventModal');
+            if (event.target === modal) {
+                closeCreateEventModal();
+            }
+        }
+    </script>
+</body>
+</html>
+
